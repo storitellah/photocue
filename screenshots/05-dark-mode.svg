@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844" font-family="'Space Grotesk',system-ui,sans-serif">
+  <rect width="390" height="844" rx="46" fill="#17150f"/>
+  <rect x="6" y="6" width="378" height="832" rx="40" fill="#17150f"/>
+  <rect x="140" y="20" width="110" height="26" rx="13" fill="#121212" opacity="1"/>
+  <g transform="translate(28,66) scale(0.06640625)">
+    <circle cx="256" cy="256" r="210" fill="#121212"/>
+    <polygon fill="#F35B35" points="256,92 223.64,187.23 288.36,187.23"/>
+    <polygon fill="#F4F0E7" points="340.66,122.6 413.86,249.38 322,256 289,198.84"/>
+    <polygon fill="#F4F0E7" points="413.86,262.62 340.66,389.4 289,313.16 322,256"/>
+    <polygon fill="#F4F0E7" points="329.2,396.02 182.8,396.02 223,313.16 289,313.16"/>
+    <polygon fill="#F4F0E7" points="171.34,389.4 98.14,262.62 190,256 223,313.16"/>
+    <polygon fill="#F4F0E7" points="98.14,249.38 171.34,122.6 223,198.84 190,256"/>
+    <circle cx="256" cy="256" r="66" fill="#121212"/>
+    <path fill="#F4F0E7" fill-rule="evenodd" d="M 256 298 C 230 274 230 224 256 222 C 282 224 282 274 256 298 Z M 245 244 a 11 11 0 1 0 22 0 a 11 11 0 1 0 -22 0 Z"/>
+  </g>
+  <text x="70" y="82" font-size="19" font-weight="700" fill="#F4F0E7">PhotoCue</text>
+  <text x="70" y="97" font-size="8" letter-spacing="2" fill="#4F5847">BY STORITELLAH</text>
+  <rect x="286" y="64" width="76" height="34" rx="17" fill="#F35B35"/>
+  <text x="324" y="86" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">Install</text>
+  <text x="28" y="150" font-size="10" letter-spacing="2" font-weight="600" fill="#65705B">DARK MODE · OFFLINE READY</text>
+  <rect x="28" y="170" width="334" height="230" rx="20" fill="#201d16" stroke="#3a362b" stroke-width="1.5"/>
+  <rect x="48" y="190" width="104" height="22" rx="11" fill="#65705B"/>
+  <text x="58" y="205" font-size="10" font-weight="700" fill="#FFFFFF">Relationship</text>
+  <text x="342" y="205" font-size="10" fill="#cfc7b5" text-anchor="end">Focused · 20–30 min</text>
+  <text x="48" y="242" font-size="22" font-weight="700" font-family="Georgia,serif" fill="#F4F0E7">A Quiet Order</text>
+  <text x="48" y="270" font-size="14" font-family="Georgia,serif" fill="#cfc7b5">Find a corner where different</text><text x="48" y="292" font-size="14" font-family="Georgia,serif" fill="#cfc7b5">routines overlap. Make a wide</text><text x="48" y="314" font-size="14" font-family="Georgia,serif" fill="#cfc7b5">frame of the shared space, then</text><text x="48" y="336" font-size="14" font-family="Georgia,serif" fill="#cfc7b5">one detail from each routine.</text>
+  <rect x="48" y="346" width="120" height="36" rx="18" fill="#65705B"/>
+  <text x="108" y="369" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">♡ Save to Story</text>
+  <rect x="178" y="346" width="110" height="36" rx="18" fill="#121212"/>
+  <text x="233" y="369" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">Try Another →</text>
+  <circle cx="195" cy="560" r="70" fill="#2a271e" stroke="#cfc7b5" stroke-width="3"/>
+  <circle cx="195" cy="560" r="56" fill="#201d16"/>
+  <polygon points="184,490 206,490 195,510" fill="#F35B35"/>
+  <text x="195" y="558" font-size="30" font-weight="700" fill="#F4F0E7" text-anchor="middle">SPIN</text>
+  <text x="195" y="578" font-size="9" letter-spacing="2" fill="#4F5847" text-anchor="middle">NEW PROMPT</text>
+  <rect x="6" y="752" width="378" height="70" fill="#201d16"/>
+  <line x1="6" y1="752" x2="384" y2="752" stroke="#3a362b"/>
+  <text x="48.75" y="786" font-size="18" fill="#B8340F" text-anchor="middle">◎</text>
+      <text x="48.75" y="804" font-size="10" font-weight="700" fill="#B8340F" text-anchor="middle">Spin</text><text x="146.25" y="786" font-size="18" fill="#cfc7b5" text-anchor="middle">▤</text>
+      <text x="146.25" y="804" font-size="10" font-weight="400" fill="#cfc7b5" text-anchor="middle">Stories</text><text x="243.75" y="786" font-size="18" fill="#cfc7b5" text-anchor="middle">♡</text>
+      <text x="243.75" y="804" font-size="10" font-weight="400" fill="#cfc7b5" text-anchor="middle">Saved</text><text x="341.25" y="786" font-size="18" fill="#cfc7b5" text-anchor="middle">⚙</text>
+      <text x="341.25" y="804" font-size="10" font-weight="400" fill="#cfc7b5" text-anchor="middle">Settings</text>
+  <rect x="125" y="818" width="140" height="5" rx="2.5" fill="#5a564a"/>
+</svg>

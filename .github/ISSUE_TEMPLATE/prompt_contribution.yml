@@ -1,0 +1,39 @@
+name: Prompt contribution
+description: Propose new prompt vocabulary, templates, or place types
+labels: [prompt-library]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        PhotoCue composes prompts from modular parts. Please propose **vocabulary
+        or templates**, not complete pre-written prompts. See
+        docs/PROMPT_ENGINE.md.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Contribution type
+      options:
+        - Vocabulary entries (a bank)
+        - Template (sentence skeleton)
+        - Place type / orientation
+        - Context tag / lens
+        - Ethical guidance
+        - Translation
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: Proposed content
+      description: List the entries or the template with its {slots}.
+    validations:
+      required: true
+  - type: checkboxes
+    id: neutral
+    attributes:
+      label: Neutrality check
+      options:
+        - label: Language is neutral and observational — no assumptions about places or people
+          required: true
+        - label: This is modular content, not a complete repetitive prompt
+          required: true

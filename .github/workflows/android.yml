@@ -1,15 +1,53 @@
-name: Android development build
-on: {workflow_dispatch: {}}
+name: Android build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - bundle
+
 jobs:
-  apk:
+  android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: 22, cache: npm}
+        with:
+          node-version: 22
+          cache: npm
       - uses: actions/setup-java@v4
-        with: {distribution: temurin, java-version: 21}
-      - run: npm ci && npm run build && npx cap add android && npx cap sync android
-      - run: cd android && ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v4
-        with: {name: photocue-debug-apk, path: android/app/build/outputs/apk/debug/app-debug.apk}
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build web app and add Android platform
+        run: |
+          npm ci
+          npm run build
+          npx cap add android
+          npx cap sync android
+
+      - name: Assemble debug APK
+        if: ${{ inputs.build_type == 'apk' }}
+        run: cd android && ./gradlew assembleDebug
+      - name: Upload APK
+        if: ${{ inputs.build_type == 'apk' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: photocue-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Build release App Bundle
+        if: ${{ inputs.build_type == 'bundle' }}
+        run: cd android && ./gradlew bundleRelease
+      - name: Upload App Bundle
+        if: ${{ inputs.build_type == 'bundle' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: photocue-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
