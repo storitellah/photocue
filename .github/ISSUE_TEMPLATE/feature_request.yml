@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest an idea for PhotoCue
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the need from a photographer's or storyteller's point of view.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Fits PhotoCue's principles
+      options:
+        - label: Keeps the app calm and focused (no ads, dashboards, or engagement mechanics)
+        - label: Works offline / privacy-first

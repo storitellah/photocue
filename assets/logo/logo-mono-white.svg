@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="PhotoCue">
+  <rect width="512" height="512"  fill="#121212"/>
+  <g><path fill="#FFFFFF" fill-rule="evenodd" d="M 46 256 a 210 210 0 1 0 420 0 a 210 210 0 1 0 -420 0 Z M 76 256 a 180 180 0 1 0 360 0 a 180 180 0 1 0 -360 0 Z"/>
+    <polygon fill="#FFFFFF" points="256,92 223.64,187.23 288.36,187.23"/>
+    <polygon fill="#FFFFFF" points="340.66,122.6 413.86,249.38 322,256 289,198.84"/>
+    <polygon fill="#FFFFFF" points="413.86,262.62 340.66,389.4 289,313.16 322,256"/>
+    <polygon fill="#FFFFFF" points="329.2,396.02 182.8,396.02 223,313.16 289,313.16"/>
+    <polygon fill="#FFFFFF" points="171.34,389.4 98.14,262.62 190,256 223,313.16"/>
+    <polygon fill="#FFFFFF" points="98.14,249.38 171.34,122.6 223,198.84 190,256"/>
+    <path fill="#FFFFFF" fill-rule="evenodd" d="M 256 298 C 230 274 230 224 256 222 C 282 224 282 274 256 298 Z M 245 244 a 11 11 0 1 0 22 0 a 11 11 0 1 0 -22 0 Z"/></g>
+</svg>

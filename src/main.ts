@@ -1,21 +1,59 @@
+/**
+ * PhotoCue bootstrap.
+ *
+ * Wires together the storage layer, i18n, PWA lifecycle, and the app
+ * controller. Everything the first screen needs is synchronous; heavier work
+ * (demo seeding, service worker) runs after the UI is interactive so the
+ * spinner is usable immediately.
+ */
+
 import './style.css';
-import {generatePrompt,modes,sanitize} from './engine'; import {clearAll,history,putPrompt,putStory,seed,stories} from './storage'; import type {Mode,Prompt,Story} from './types';
-import {Haptics,ImpactStyle} from '@capacitor/haptics'; import {Share} from '@capacitor/share'; import {jsPDF} from 'jspdf';
-const stages=['Story question','Opening image','Location and context','Main character','Daily routine','Relationships','Important details','Challenge or tension','Change or response','Consequences','Quiet moment','Closing image'];
-const app=document.querySelector<HTMLDivElement>('#app')!; let current:Prompt|undefined; let spin=Number(sessionStorage.getItem('spins')||0); let view='spin';
-const esc=(s:string)=>s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]!));
-function shell(content:string){app.innerHTML=`<header><a class="brand" href="#spin" aria-label="PhotoCue home"><img src="${import.meta.env.BASE_URL}icon.svg" alt=""><span><b>PhotoCue</b><small>BY STORITELLAH</small></span></a><button class="icon-button" id="install" hidden>Install</button></header><main id="main">${content}</main><nav aria-label="Primary"><button data-view="spin" class="${view==='spin'?'active':''}">◎<span>Spin</span></button><button data-view="stories" class="${view==='stories'?'active':''}">▤<span>Stories</span></button><button data-view="saved" class="${view==='saved'?'active':''}">♡<span>Saved</span></button><button data-view="settings" class="${view==='settings'?'active':''}">⚙<span>Settings</span></button></nav><div class="sr-only" aria-live="polite" id="announce"></div>`; app.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view!;render()});}
-function spinView(){const location=esc(localStorage.getItem('location')||'');return `<section class="intro"><p class="eyebrow">FIELD PROMPT · OFFLINE READY</p><h1>One tap. One place.<br><em>One story.</em></h1><p>Observe more carefully. Find the frame that moves your story forward.</p></section><section class="controls"><label for="location">Enter a place</label><div class="location"><input id="location" value="${location}" placeholder="e.g. A neighbourhood market" maxlength="120"><button id="locate" aria-label="Use my approximate location" title="Use my location">⌖</button></div><label for="mode">Prompt mode</label><select id="mode">${modes.map(m=>`<option>${m}</option>`).join('')}</select></section><section class="dial-wrap"><button class="dial" id="dial" aria-label="Spin a new photography prompt"><span class="pointer">▼</span><span class="ring"><i>DETAIL</i><i>STORY</i><i>LIGHT</i><i>PLACE</i></span><span class="dial-centre"><b>SPIN</b><small>NEW PROMPT</small></span></button><button class="primary" id="spin">Spin a Prompt <span>→</span></button><p class="hint">Tap the dial, button, or press space</p></section><div id="prompt">${current?promptCard(current):''}</div><section class="landing"><h2>Build stories, not shot lists.</h2><div class="features"><article><b>01</b><h3>Made for the field</h3><p>Fast, focused prompts built for careful observation.</p></article><article><b>02</b><h3>Shape a full story</h3><p>A flexible path from opening image to closing frame.</p></article><article><b>03</b><h3>Private by default</h3><p>No account. Your stories and notes stay on this device.</p></article></div></section>`}
-function promptCard(p:Prompt){return `<article class="prompt-card"><div class="card-top"><span>${esc(p.mode)}</span><span>${esc(p.difficulty)} · ${esc(p.time)}</span></div><h2>${esc(p.title)}</h2><p class="assignment">${esc(p.assignment)}</p><div class="role">STORY ROLE <b>${esc(p.role)}</b></div><details><summary>Why it matters</summary><p>${esc(p.why)}</p></details><details><summary>Try another angle</summary><p>${esc(p.variation)}</p></details><details><summary>Reflection</summary><p>${esc(p.reflection)}</p></details>${localStorage.getItem('ethics')!=='off'?`<p class="ethics">◇ ${esc(p.ethics||'')}</p>`:''}<div class="actions"><button id="save">♡ Save to Story</button><button id="share">Share</button><button id="again">Try Another →</button></div></article>`}
-async function doSpin(){const loc=sanitize((document.querySelector<HTMLInputElement>('#location')?.value)||'');localStorage.setItem('location',loc);spin++;sessionStorage.setItem('spins',String(spin));const mode=(document.querySelector<HTMLSelectElement>('#mode')?.value||'General Prompt') as Mode;current=generatePrompt({seed:seed(),spin,mode,location:loc,recent:(await history()).slice(-100)});await putPrompt(current);document.querySelector('#prompt')!.innerHTML=promptCard(current);document.querySelector('.dial')?.classList.add('spinning');bindCard();document.querySelector('#announce')!.textContent=`New prompt: ${current.title}. ${current.assignment}`;Haptics.impact({style:ImpactStyle.Light}).catch(()=>{});document.querySelector('#prompt')!.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})}
-async function save(){if(!current)return;let ss=await stories();let s=ss[0];if(!s)s={id:crypto.randomUUID(),title:'My Photo Story',location:localStorage.getItem('location')||'',question:'What does careful observation reveal?',theme:'Everyday life',prompts:[],stage:0};if(!s.prompts.some(p=>p.id===current!.id)){s.prompts.push({...current,status:'Not started',notes:''});s.stage=Math.min(s.stage+1,stages.length-1);await putStory(s)}alert(`Saved. Next story stage: ${stages[s.stage]}`)}
-function bindCard(){document.querySelector<HTMLButtonElement>('#save')?.addEventListener('click',save);document.querySelector<HTMLButtonElement>('#again')?.addEventListener('click',doSpin);document.querySelector<HTMLButtonElement>('#share')?.addEventListener('click',()=>current&&Share.share({title:current.title,text:`${current.title}\n\n${current.assignment}`}).catch(()=>navigator.clipboard.writeText(current!.assignment)))}
-async function storiesView(savedOnly=false){const ss=await stories();const prompts=ss.flatMap(s=>s.prompts);shell(`<section class="page"><p class="eyebrow">${savedOnly?'FIELD COLLECTION':'STORY WORKSPACE'}</p><h1>${savedOnly?'Saved prompts':'Your stories'}</h1>${!prompts.length?`<div class="empty"><h2>${savedOnly?'Save prompts you want to explore in the field.':'Start with one place, one question, and one photograph.'}</h2><button class="primary" data-view="spin">Spin a Prompt →</button></div>`:ss.map(s=>`<article class="story"><span>${esc(s.location||'General')}</span><h2>${esc(s.title)}</h2><p>${esc(s.question)}</p><div class="progress" aria-label="${s.stage} of ${stages.length} stages"><i style="width:${s.stage/stages.length*100}%"></i></div><small>${s.stage}/${stages.length} stages · Next: ${stages[s.stage]}</small>${s.prompts.map(p=>`<details><summary>${esc(p.title)} <small>${p.status}</small></summary><p>${esc(p.assignment)}</p><label>Field note<textarea data-story="${s.id}" data-prompt="${p.id}" placeholder="Add a Field Note">${esc(p.notes)}</textarea></label></details>`).join('')}<div class="actions"><button data-export="${s.id}">Export PDF</button><button data-text="${s.id}">Plain text</button></div></article>`).join('')}</section>`);bindNav();document.querySelectorAll<HTMLTextAreaElement>('textarea').forEach(t=>t.onchange=async()=>{const s=ss.find(x=>x.id===t.dataset.story)!;s.prompts.find(p=>p.id===t.dataset.prompt)!.notes=sanitize(t.value);await putStory(s)});document.querySelectorAll<HTMLButtonElement>('[data-export]').forEach(b=>b.onclick=()=>exportPdf(ss.find(s=>s.id===b.dataset.export)!));document.querySelectorAll<HTMLButtonElement>('[data-text]').forEach(b=>b.onclick=()=>downloadText(ss.find(s=>s.id===b.dataset.text)!))}
-function exportPdf(s:Story){const pdf=new jsPDF();pdf.setFontSize(22);pdf.text(s.title,20,25);pdf.setFontSize(11);pdf.text(`${s.location}\n${s.question}`,20,35);let y=55;s.prompts.forEach((p,i)=>{if(y>260){pdf.addPage();y=25}pdf.setFontSize(14);pdf.text(`${i+1}. ${p.title}`,20,y);pdf.setFontSize(10);const lines=pdf.splitTextToSize(p.assignment,170);pdf.text(lines,20,y+7);y+=lines.length*5+15});pdf.save(`${s.title}.pdf`)}
-function downloadText(s:Story){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([`${s.title}\n${s.location}\n${s.question}\n\n${s.prompts.map(p=>`${p.title}\n${p.assignment}\nNote: ${p.notes}`).join('\n\n')}`],{type:'text/plain'}));a.download=`${s.title}.txt`;a.click()}
-function settingsView(){shell(`<section class="page"><p class="eyebrow">LOCAL & PRIVATE</p><h1>Settings</h1><div class="settings"><label><span>Ethics reminders<small>Practical guidance appears with relevant prompts.</small></span><input type="checkbox" id="ethics" ${localStorage.getItem('ethics')!=='off'?'checked':''}></label><label><span>High contrast<small>Increase borders and visual separation.</small></span><input type="checkbox" id="contrast" ${localStorage.getItem('contrast')==='on'?'checked':''}></label><label><span>Text size</span><select id="text-size"><option>Default</option><option ${localStorage.getItem('size')==='large'?'selected':''}>Large</option></select></label><hr><h2>Your data</h2><p>Stories, notes, locations, and prompt history remain on this device. No account or analytics.</p><button id="backup">Export JSON backup</button><label class="button">Import backup<input id="import" type="file" accept="application/json" hidden></label><button class="danger" id="delete">Delete all data</button><hr><h2>Ethics in the field</h2><p>Explain how images may be used. Give people room to decline. Avoid stereotypes, private information, and exposing vulnerable people. Observation is not staging.</p></div></section>`);bindNav();document.querySelector<HTMLInputElement>('#ethics')!.onchange=e=>localStorage.setItem('ethics',(e.target as HTMLInputElement).checked?'on':'off');document.querySelector<HTMLInputElement>('#contrast')!.onchange=e=>{localStorage.setItem('contrast',(e.target as HTMLInputElement).checked?'on':'off');applyPrefs()};document.querySelector<HTMLSelectElement>('#text-size')!.onchange=e=>{localStorage.setItem('size',(e.target as HTMLSelectElement).value==='Large'?'large':'');applyPrefs()};document.querySelector<HTMLButtonElement>('#delete')!.onclick=()=>confirm('Permanently delete all PhotoCue data on this device?')&&clearAll();document.querySelector<HTMLButtonElement>('#backup')!.onclick=backup}
-async function backup(){const data={applicationVersion:'1.0.0',backupFormatVersion:1,exportDate:new Date().toISOString(),stories:await stories(),promptHistory:await history(),settings:{ethics:localStorage.getItem('ethics'),location:localStorage.getItem('location')}};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='photocue-backup.json';a.click()}
-function bindNav(){app.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view!;render()})}
-function applyPrefs(){document.documentElement.classList.toggle('contrast',localStorage.getItem('contrast')==='on');document.documentElement.classList.toggle('large',localStorage.getItem('size')==='large')}
-async function render(){if(view==='stories')return storiesView();if(view==='saved')return storiesView(true);if(view==='settings')return settingsView();shell(spinView());bindNav();document.querySelector('#spin')!.addEventListener('click',doSpin);document.querySelector('#dial')!.addEventListener('click',doSpin);document.querySelector('#location')!.addEventListener('change',e=>localStorage.setItem('location',sanitize((e.target as HTMLInputElement).value)));document.querySelector('#locate')!.addEventListener('click',()=>{if(!confirm('PhotoCue will request your approximate location. Coordinates are not stored. Continue?'))return;navigator.geolocation.getCurrentPosition(()=>{(document.querySelector('#location') as HTMLInputElement).value='My approximate location'},()=>alert('Location is unavailable. Enter a place instead.'),{enableHighAccuracy:false,maximumAge:3600000})});bindCard()}
-window.addEventListener('keydown',e=>{if(e.code==='Space'&&view==='spin'&&!['INPUT','SELECT','TEXTAREA','BUTTON'].includes((e.target as HTMLElement).tagName)){e.preventDefault();doSpin()}});applyPrefs();render();
+import { App } from './ui/app';
+import { getPreferences } from './storage/preferences';
+import { setLocale } from './i18n';
+import { getStories, putStory, getMeta, setMeta } from './storage/db';
+import { createDemoStory } from './data/demo';
+import { getInstallationSeed } from './storage/seed';
+import { initPwa } from './pwa/register';
+
+async function seedDemoOnce(): Promise<void> {
+  try {
+    const seeded = await getMeta<boolean>('demoSeeded');
+    if (seeded) return;
+    const existing = await getStories();
+    if (existing.length === 0) {
+      await putStory(createDemoStory());
+    }
+    await setMeta('demoSeeded', true);
+  } catch {
+    /* demo is a nicety, never block startup on it */
+  }
+}
+
+function bootstrap(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+
+  const prefs = getPreferences();
+  setLocale(prefs.language);
+
+  // Ensure an installation seed exists (used by the engine and, optionally, backups).
+  getInstallationSeed();
+
+  const app = new App(root);
+  app.applyPrefsToDocument();
+
+  initPwa({
+    onUpdate: () => app.notifyUpdate(),
+    onInstallable: () => app.refreshInstallButton(),
+  });
+
+  // Non-blocking startup work.
+  void seedDemoOnce();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  bootstrap();
+}
