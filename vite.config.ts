@@ -4,13 +4,15 @@ import { VitePWA } from 'vite-plugin-pwa';
 /**
  * PhotoCue build configuration.
  *
- * Static-first and GitHub Pages friendly. In production the app is served from
- * the `/photocue/` sub-path; locally it is served from root. The PWA plugin
- * generates the service worker (offline caching + navigation fallback) and the
- * web manifest with the full icon set.
+ * Static-first and host-agnostic. The public base path is driven by the
+ * `BASE_PATH` env var and defaults to `/` — correct for root-served hosts such
+ * as Cloudflare Pages, Netlify, and local dev. GitHub Pages serves from the
+ * `/photocue/` sub-path, so its workflow sets `BASE_PATH=/photocue/`. The PWA
+ * plugin generates the service worker (offline caching + navigation fallback)
+ * and the web manifest with the full icon set.
  */
-export default defineConfig(({ mode }) => {
-  const base = mode === 'production' ? '/photocue/' : '/';
+export default defineConfig(() => {
+  const base = process.env.BASE_PATH ?? '/';
   return {
     base,
     build: {
