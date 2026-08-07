@@ -288,6 +288,11 @@ export class App {
     }
     await addHistory(prompt);
 
+    // Guard against the rare case where the document is gone by the time this
+    // async continuation resumes (e.g. a torn-down test environment). In a real
+    // browser `document` always exists, so this is a no-op in production.
+    if (typeof document === 'undefined') return;
+
     // Render the card immediately — never wait on animation.
     const slot = qs('#prompt-slot');
     if (slot) slot.innerHTML = promptCard(prompt, { showEthics: prefs.ethicsReminders });

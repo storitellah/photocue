@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../src/ui/app';
 
 /**
@@ -13,6 +13,12 @@ beforeEach(() => {
   localStorage.clear();
   document.body.innerHTML = '<div id="app"></div>';
   location.hash = '#/spin';
+});
+
+// Let any trailing async work started by a spin (history writes, dynamic
+// imports) settle before the environment is torn down, so nothing runs after.
+afterEach(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 20));
 });
 
 function mount(): App {
