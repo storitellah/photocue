@@ -74,6 +74,30 @@ const GENERAL: Template[] = [
     variation: 'Return {timeframe} and compare what changed.',
     slots: ['subject', 'distance', 'perspective', 'purpose', 'timeframe'],
   },
+  {
+    id: 'g-cine-layers',
+    assignment:
+      '{lead}find {subject} and {filmGrammar}. Shoot {lightQuality}, and wait for {moment}.',
+    why: 'Thinking like a cinematographer — in layers and light — can {purpose}.',
+    variation: 'Then {storySpine}, and make the single frame that carries it.',
+    slots: ['subject', 'filmGrammar', 'lightQuality', 'moment', 'purpose', 'storySpine'],
+  },
+  {
+    id: 'g-cine-lens',
+    assignment:
+      '{lead}choose one lens and commit: {lens}. Photograph {subject}, holding for {moment}.',
+    why: 'A deliberate focal length is a point of view, and it can {purpose}.',
+    variation: 'Keep the same lens but change your position until {detail} leads the frame.',
+    slots: ['lens', 'subject', 'moment', 'purpose', 'detail'],
+  },
+  {
+    id: 'g-cine-spine',
+    assignment:
+      '{lead}{storySpine}. Build it from {subject}, {filmGrammar}, {lightQuality}.',
+    why: 'Naming an image’s job in the story before you shoot can {purpose}.',
+    variation: 'Make one alternate frame that would cut against it, {perspective}.',
+    slots: ['storySpine', 'subject', 'filmGrammar', 'lightQuality', 'purpose', 'perspective'],
+  },
 ];
 
 /** Mode-specific templates layered on top of the general base. */

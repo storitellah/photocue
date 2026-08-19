@@ -49,6 +49,12 @@ export type PlaceType =
 /** Difficulty labels are colour-independent status words. */
 export type Difficulty = 'Gentle' | 'Focused' | 'Challenging';
 
+/** Stylistic lean applied to generated prompts. */
+export type PromptStyle = 'observational' | 'cinematic' | 'poetic';
+
+/** How a prompt was produced — the local engine, or the optional AI service. */
+export type PromptSource = 'engine' | 'ai';
+
 /** Progress status for a saved prompt within a story. */
 export type PromptStatus =
   | 'Not started'
@@ -88,6 +94,8 @@ export interface Prompt {
   placeType?: PlaceType;
   storyStage?: string;
   createdAt: string;
+  /** Where the prompt came from. Absent means the local engine. */
+  source?: PromptSource;
 }
 
 /** A prompt saved into a story, with field-work state attached. */
@@ -132,6 +140,13 @@ export interface Preferences {
   locationHistory: boolean;
   analytics: boolean;
   language: string;
+  /** Stylistic lean for generated prompts. */
+  promptStyle: PromptStyle;
+  /**
+   * Opt-in: use the online AI service to compose prompts when available.
+   * Off by default — the app stays fully offline and private unless enabled.
+   */
+  aiEnabled: boolean;
 }
 
 /** The versioned backup envelope. */

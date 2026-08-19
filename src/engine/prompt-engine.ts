@@ -14,7 +14,7 @@
  * entropy (which degrades gracefully).
  */
 
-import type { ComponentVector, Difficulty, Mode, PlaceType, Prompt } from '../types';
+import type { ComponentVector, Difficulty, Mode, PlaceType, Prompt, PromptStyle } from '../types';
 import { MODE_ROLE } from '../data/modes';
 import { PLACE_ORIENTATION } from '../data/place-types';
 import { TAG_LENS } from '../data/context-tags';
@@ -36,12 +36,17 @@ import {
   difficulties,
   distances,
   ethics as ethicsBank,
+  filmGrammar,
+  lenses,
+  lightQualities,
   lighting,
+  moments,
   movements,
   perspectives,
   purposes,
   reflections,
   relationships,
+  storySpines,
   subjects,
   times,
   timeframes,
@@ -65,6 +70,11 @@ const BANKS: Record<string, readonly string[]> = {
   timeframe: timeframes,
   contrast: contrasts,
   constraint: constraints,
+  lens: lenses,
+  lightQuality: lightQualities,
+  filmGrammar: filmGrammar,
+  moment: moments,
+  storySpine: storySpines,
 };
 
 /** Modes for which an ethics reminder is (almost) always relevant. */
@@ -94,6 +104,12 @@ export interface GenerateInput {
   storyId?: string;
   storyStage?: string;
   contextTags?: string[];
+  /**
+   * Optional stylistic lean. `cinematic` favours film-grammar templates;
+   * `poetic` favours atmosphere-led ones; `observational` (default) uses the
+   * full pool. Never passed in tests, so default behaviour is unchanged.
+   */
+  style?: PromptStyle;
   /** Recent prompts to stay fresh against (most recent last). */
   recent?: Pick<Prompt, 'fingerprint' | 'components'>[];
   /**
@@ -129,6 +145,23 @@ export function fingerprint(components: ComponentVector): string {
     .sort()
     .map((k) => `${k}:${components[k]}`)
     .join('|');
+}
+
+/** Slots that mark a template as cinematic / film-grammar led. */
+const CINEMATIC_SLOTS = new Set(['filmGrammar', 'lens', 'lightQuality', 'moment', 'storySpine']);
+
+/**
+ * Narrow a template pool to match a requested style. Falls back to the full
+ * pool when the style has no matching templates, so generation never fails.
+ */
+function biasPool(pool: Template[], style?: PromptStyle): Template[] {
+  if (!style || style === 'observational') return pool;
+  const wants = (t: Template): boolean =>
+    style === 'cinematic'
+      ? t.slots.some((s) => CINEMATIC_SLOTS.has(s))
+      : /* poetic */ t.slots.includes('atmosphere') || t.slots.includes('storySpine') || /close|ref|trace/.test(t.id);
+  const subset = pool.filter(wants);
+  return subset.length ? subset : pool;
 }
 
 /** Assemble a single candidate prompt from a chosen template. */
@@ -263,7 +296,7 @@ export function generatePrompt(input: GenerateInput): Prompt {
       attempt,
     ].join('|');
     const rng = rngFromString(seedString);
-    const pool = templatesFor(input.mode);
+    const pool = biasPool(templatesFor(input.mode), input.style);
     const template = pool[Math.floor(rng() * pool.length)];
     const candidate = compose(template, input, rng);
 

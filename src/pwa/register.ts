@@ -67,3 +67,20 @@ export async function applyUpdate(): Promise<void> {
     if (typeof location !== 'undefined') location.reload();
   }
 }
+
+/**
+ * Manually ask the browser to check for a newer service worker. If one is
+ * found, the registered `onNeedRefresh` handler fires and the update banner
+ * appears. Resolves `true` when a check was actually performed.
+ */
+export async function checkForUpdate(): Promise<boolean> {
+  try {
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return false;
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return false;
+    await reg.update();
+    return true;
+  } catch {
+    return false;
+  }
+}

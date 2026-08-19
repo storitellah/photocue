@@ -33,6 +33,12 @@ export const subjects = [
   'a trace left by someone who is no longer present',
   'a spot where waiting happens',
   'a detail that shows how time passes here',
+  'a face caught between two expressions',
+  'the space a person keeps returning to',
+  'a moment of transaction, however small',
+  'a gesture handed down through repetition',
+  'the threshold where a private world meets a public one',
+  'the object someone reaches for without looking',
 ];
 
 /** activity — human action in progress. */
@@ -71,6 +77,11 @@ export const approaches = [
   'frame the space first, then wait for a person to enter it',
   'photograph what happens at the edges, not the centre',
   'move closer in three steps rather than zooming',
+  'anticipate the moment instead of reacting to it, and be ready before it arrives',
+  'compose the empty frame first, then let the story walk into it',
+  'shoot through something in the foreground to give the frame depth',
+  'stay at eye level with your subject rather than above or below them',
+  'work the scene: make ten frames of the same subject, each one different',
 ];
 
 /** purpose — the narrative reason for the image. */
@@ -253,6 +264,74 @@ export const titleClosers = [
   'Steady Routine',
   'What Remains',
   'the Overlooked',
+];
+
+/**
+ * lens — focal-length and depth guidance in a documentary photographer's terms.
+ * Neutral craft language: how to see, not what to conclude.
+ */
+export const lenses = [
+  'work wide (24–35mm) and step in close, letting the room breathe around your subject',
+  'stay at a normal 50mm and keep the distance a person would naturally stand at',
+  'reach with a short telephoto (85mm) and compress the layers of the scene',
+  'shoot at your widest and let the foreground fall away into the background',
+  'keep a shallow depth of field so one detail stays sharp and the rest softens',
+  'stop down for deep focus so near and far read as one continuous space',
+  'frame with a longer lens from across the room, present but unobtrusive',
+];
+
+/**
+ * light quality — named documentary light, described observationally.
+ */
+export const lightQualities = [
+  'in raking window light that skims across the surface',
+  'in flat, even shade where nothing competes for attention',
+  'against the light, letting a rim of brightness separate figure from ground',
+  'in the warm, low light of the last hour',
+  'in the hard midday light and its short, decisive shadows',
+  'in the blue quiet just before the lights come on',
+  'where a single practical light does all the work',
+  'in the mixed light where daylight and interior light meet',
+];
+
+/**
+ * film grammar — visual-storytelling and cinematographer's framing methods,
+ * translated to still documentary work.
+ */
+export const filmGrammar = [
+  'block the frame in layers — a foreground element, your subject, a background that explains the place',
+  'hold on one composition and let the action move through it, the way a locked-off shot would',
+  'find a natural frame within the frame — a doorway, a window, a gap between people',
+  'use leading lines already in the scene to carry the eye to your subject',
+  'build an establishing frame, then a detail, then a reaction, as if cutting a scene',
+  'shoot the same beat from two distances so the pair reads like a wide and a close-up',
+  'let negative space carry the mood rather than filling the frame',
+  'place the horizon or a strong line off-centre and let the imbalance create tension',
+];
+
+/**
+ * moment — the kind of instant a documentary photographer waits for.
+ */
+export const moments = [
+  'the decisive moment where gesture, light, and composition briefly align',
+  'the quiet beat just after the main action, when people forget the camera',
+  'the in-between moment that a posed photograph would skip',
+  'the exchange of a glance that lasts less than a second',
+  'the moment a routine reaches its small turning point',
+  'the pause where anticipation is visible on a face or in the hands',
+  'the overlap where one activity ends and the next has not yet begun',
+];
+
+/**
+ * story spine — a one-line narrative intention, in a filmmaker's terms.
+ */
+export const storySpines = [
+  'treat this frame as the opening shot of a longer film',
+  'imagine this as the single image a whole story would be captioned by',
+  'shoot it as the cutaway that gives a sequence its breathing room',
+  'make it the reveal that recontextualises everything before it',
+  'let it be the closing image a viewer keeps after the story ends',
+  'build it as the establishing frame a narrator would speak over',
 ];
 
 /** Difficulty and time banks (secondary variation). */

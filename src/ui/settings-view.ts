@@ -17,6 +17,7 @@ export interface SettingsHandlers {
   deleteAll: () => void;
   clearLocation: () => void;
   openWorkshop: () => void;
+  checkForUpdates: () => void;
   onChange: () => void;
 }
 
@@ -75,6 +76,23 @@ export function renderSettings(): string {
     </div>
 
     <div class="settings-group">
+      <h2>${escapeHtml(s.settings.promptsHeading)}</h2>
+      <label class="setting-row">
+        <span class="setting-text"><span class="setting-label">${escapeHtml(s.settings.promptStyle)}</span><small>${escapeHtml(s.settings.promptStyleHelp)}</small></span>
+        <select id="set-prompt-style" class="field-select">
+          <option value="observational" ${prefs.promptStyle === 'observational' ? 'selected' : ''}>${escapeHtml(s.settings.styleObservational)}</option>
+          <option value="cinematic" ${prefs.promptStyle === 'cinematic' ? 'selected' : ''}>${escapeHtml(s.settings.styleCinematic)}</option>
+          <option value="poetic" ${prefs.promptStyle === 'poetic' ? 'selected' : ''}>${escapeHtml(s.settings.stylePoetic)}</option>
+        </select>
+      </label>
+      <label class="setting-row">
+        <span class="setting-text"><span class="setting-label">${escapeHtml(s.settings.ai)} <span class="tag-inline">${escapeHtml(s.settings.aiBeta)}</span></span><small>${escapeHtml(s.settings.aiHelp)}</small></span>
+        <input type="checkbox" id="set-ai" class="switch" ${prefs.aiEnabled ? 'checked' : ''}>
+      </label>
+      <p class="muted ai-note" id="ai-note" ${prefs.aiEnabled ? '' : 'hidden'}>${escapeHtml(s.settings.aiPrivacyNote)}</p>
+    </div>
+
+    <div class="settings-group">
       <h2>${escapeHtml(s.settings.dataHeading)}</h2>
       <p class="muted">${escapeHtml(s.settings.dataBlurb)}</p>
       ${toggle('set-loc-history', s.settings.locationHistory, 'Keep your last place between sessions.', prefs.locationHistory)}
@@ -99,6 +117,16 @@ export function renderSettings(): string {
         ${ETHICS_POINTS.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}
       </ul>
       <p class="muted">Essential safety reminders stay active even when ethics reminders are hidden on cards.</p>
+    </div>
+
+    <div class="settings-group">
+      <h2>${escapeHtml(s.settings.updatesHeading)}</h2>
+      <p class="muted">PhotoCue <b>${escapeHtml(APP_VERSION)}</b></p>
+      <div class="button-row">
+        <button class="btn-secondary" id="set-check-update">${escapeHtml(s.settings.checkUpdate)}</button>
+        <a class="btn-secondary" href="https://github.com/storitellah/photocue/blob/main/CHANGELOG.md" rel="noopener">${escapeHtml(s.settings.changelog)}</a>
+      </div>
+      <p class="muted" id="update-status" role="status" hidden></p>
     </div>
 
     <div class="settings-group about">
@@ -142,6 +170,18 @@ export function bindSettings(h: SettingsHandlers): void {
   on(qs<HTMLInputElement>('#set-analytics'), 'change', (e) =>
     savePreferences({ analytics: (e.target as HTMLInputElement).checked }),
   );
+  on(qs<HTMLSelectElement>('#set-prompt-style'), 'change', (e) => {
+    savePreferences({ promptStyle: (e.target as HTMLSelectElement).value as 'observational' | 'cinematic' | 'poetic' });
+    change();
+  });
+  on(qs<HTMLInputElement>('#set-ai'), 'change', (e) => {
+    const enabled = (e.target as HTMLInputElement).checked;
+    savePreferences({ aiEnabled: enabled });
+    const note = qs('#ai-note');
+    if (note) (note as HTMLElement).hidden = !enabled;
+    change();
+  });
+  on(qs('#set-check-update'), 'click', () => h.checkForUpdates());
   on(qs('#set-export'), 'click', () => h.exportBackup());
   on(qs<HTMLInputElement>('#set-import'), 'change', (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440" width="440" height="440" role="img" aria-label="PhotoCue spinning dial">
+  <title>PhotoCue — spin a documentary photo prompt</title>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="46%" r="60%">
+      <stop offset="0%" stop-color="#F4F0E7"/>
+      <stop offset="72%" stop-color="#F4F0E7"/>
+      <stop offset="100%" stop-color="#E7E0D0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- soft plate -->
+  <circle cx="220" cy="220" r="210" fill="url(#glow)"/>
+  <circle cx="220" cy="220" r="206" fill="none" stroke="#121212" stroke-width="4"/>
+
+  <!-- rotating tick ring -->
+  <g>
+    <g stroke="#65705B" stroke-width="3" stroke-linecap="round">
+      <line x1="220" y1="26" x2="220" y2="46"/>
+      <line x1="220" y1="26" x2="220" y2="46" transform="rotate(60 220 220)"/>
+      <line x1="220" y1="26" x2="220" y2="46" transform="rotate(120 220 220)"/>
+      <line x1="220" y1="26" x2="220" y2="46" transform="rotate(180 220 220)"/>
+      <line x1="220" y1="26" x2="220" y2="46" transform="rotate(240 220 220)"/>
+      <line x1="220" y1="26" x2="220" y2="46" transform="rotate(300 220 220)"/>
+    </g>
+    <g stroke="#C9C0AC" stroke-width="2" stroke-linecap="round" opacity="0.9">
+      <line x1="220" y1="30" x2="220" y2="42" transform="rotate(30 220 220)"/>
+      <line x1="220" y1="30" x2="220" y2="42" transform="rotate(90 220 220)"/>
+      <line x1="220" y1="30" x2="220" y2="42" transform="rotate(150 220 220)"/>
+      <line x1="220" y1="30" x2="220" y2="42" transform="rotate(210 220 220)"/>
+      <line x1="220" y1="30" x2="220" y2="42" transform="rotate(270 220 220)"/>
+      <line x1="220" y1="30" x2="220" y2="42" transform="rotate(330 220 220)"/>
+    </g>
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 220 220" to="360 220 220" dur="9s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- rotating aperture (documentary lens) -->
+  <g>
+    <circle cx="220" cy="220" r="150" fill="#121212"/>
+    <g fill="#F4F0E7">
+      <polygon points="304.66,86.6 377.86,213.38 286,220 253,162.84"/>
+      <polygon points="377.86,226.62 304.66,353.4 253,277.16 286,220"/>
+      <polygon points="293.2,360.02 146.8,360.02 187,277.16 253,277.16"/>
+      <polygon points="135.34,353.4 62.14,226.62 154,220 187,277.16"/>
+      <polygon points="62.14,213.38 135.34,86.6 187,162.84 154,220"/>
+      <polygon points="146.8,79.98 293.2,79.98 253,162.84 187,162.84"/>
+    </g>
+    <circle cx="220" cy="220" r="60" fill="#121212"/>
+    <path fill="#F4F0E7" fill-rule="evenodd" d="M 220 258 C 197 236 197 192 220 190 C 243 192 243 236 220 258 Z M 210 208 a 10 10 0 1 0 20 0 a 10 10 0 1 0 -20 0 Z"/>
+    <animateTransform attributeName="transform" type="rotate"
+      from="360 220 220" to="0 220 220" dur="14s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- fixed pointer + gentle pulse -->
+  <polygon points="220,8 206,40 234,40" fill="#F35B35">
+    <animate attributeName="opacity" values="1;0.55;1" dur="2.2s" repeatCount="indefinite"/>
+  </polygon>
+</svg>

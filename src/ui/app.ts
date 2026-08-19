@@ -10,6 +10,7 @@
 
 import type { Mode, PlaceType, Prompt, PromptStatus, Story } from '../types';
 import { generatePrompt } from '../engine';
+import { generatePromptAI, aiAvailable } from '../engine/ai';
 import { MODES, MODE_DESCRIPTION } from '../data/modes';
 import { addHistory, getRecentHistory } from '../storage/db';
 import { getPreferences, savePreferences, clearLocationData } from '../storage/preferences';
@@ -48,7 +49,7 @@ import {
 } from './components';
 import { renderSettings, bindSettings } from './settings-view';
 import { renderWorkshop, bindWorkshop } from './workshop-view';
-import { canInstall, promptInstall, applyUpdate } from '../pwa/register';
+import { canInstall, promptInstall, applyUpdate, checkForUpdate } from '../pwa/register';
 import { t } from '../i18n';
 
 type View = 'spin' | 'stories' | 'saved' | 'settings' | 'workshop';
@@ -168,30 +169,35 @@ export class App {
     const prefs = getPreferences();
     const s = t();
     const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+    const hasRefinements = Boolean(prefs.location || prefs.placeType || prefs.contextTags.length);
     this.shell(`
-      <section class="intro">
+      <section class="stage" aria-label="Prompt spinner">
         <p class="eyebrow">${escapeHtml(s.spin.eyebrow)}</p>
-        <h1 class="display">${escapeHtml(s.spin.headingA)}<br><em>${escapeHtml(s.spin.headingB)}</em></h1>
-        <p class="lede">${escapeHtml(s.spin.intro)}</p>
+        ${offline ? `<p class="offline-note" role="status">${escapeHtml(s.spin.offline)}</p>` : ''}
+        ${dial()}
+        <div id="prompt-slot" aria-live="polite">${this.current ? promptCard(this.current, { showEthics: prefs.ethicsReminders }) : `<p class="stage-lede">${escapeHtml(s.spin.intro)}</p>`}</div>
+        <details class="refine" ${hasRefinements ? 'open' : ''}>
+          <summary>
+            <span class="refine-title">${escapeHtml(s.spin.refine)}</span>
+            <span class="refine-hint">${escapeHtml(s.spin.refineHint)}</span>
+          </summary>
+          <div class="controls" aria-label="Prompt controls">
+            <label class="field-label" for="location">${escapeHtml(s.spin.enterPlace)}</label>
+            <div class="location-row">
+              <input id="location" class="field-input" type="text" inputmode="text" autocomplete="off"
+                value="${escapeHtml(prefs.location)}" placeholder="${escapeHtml(s.spin.placePlaceholder)}" maxlength="120">
+              <button id="locate" class="icon-button" aria-label="${escapeHtml(s.spin.useLocation)}" title="${escapeHtml(s.spin.useLocation)}">
+                <span aria-hidden="true">⌖</span>
+              </button>
+            </div>
+            <div class="control-grid">
+              <div>${modeSelect(prefs.mode)}</div>
+              <div>${placeTypeSelect(prefs.placeType)}</div>
+            </div>
+            <details class="theme-details"><summary>${escapeHtml(s.spin.themeTags)}</summary>${contextTags(prefs.contextTags)}</details>
+          </div>
+        </details>
       </section>
-      ${offline ? `<p class="offline-note" role="status">${escapeHtml(s.spin.offline)}</p>` : ''}
-      <section class="controls" aria-label="Prompt controls">
-        <label class="field-label" for="location">${escapeHtml(s.spin.enterPlace)}</label>
-        <div class="location-row">
-          <input id="location" class="field-input" type="text" inputmode="text" autocomplete="off"
-            value="${escapeHtml(prefs.location)}" placeholder="${escapeHtml(s.spin.placePlaceholder)}" maxlength="120">
-          <button id="locate" class="icon-button" aria-label="${escapeHtml(s.spin.useLocation)}" title="${escapeHtml(s.spin.useLocation)}">
-            <span aria-hidden="true">⌖</span>
-          </button>
-        </div>
-        <div class="control-grid">
-          <div>${modeSelect(prefs.mode)}</div>
-          <div>${placeTypeSelect(prefs.placeType)}</div>
-        </div>
-        <details class="theme-details"><summary>${escapeHtml(s.spin.themeTags)}</summary>${contextTags(prefs.contextTags)}</details>
-      </section>
-      ${dial()}
-      <div id="prompt-slot" aria-live="polite">${this.current ? promptCard(this.current, { showEthics: prefs.ethicsReminders }) : ''}</div>
       <section class="landing">
         <div class="feature-grid">
           <article><span class="feat-num">01</span><h3>Made for the field</h3><p>Fast, focused prompts built for careful observation, fully offline.</p></article>
@@ -270,7 +276,9 @@ export class App {
     sessionStorage.setItem(SPIN_KEY, String(this.spins));
 
     const recent = await getRecentHistory(100);
-    const prompt = generatePrompt({
+    // The offline engine always produces a prompt: instant, private, and the
+    // guaranteed fallback if the optional AI service is off or unreachable.
+    let prompt = generatePrompt({
       seed: getInstallationSeed(),
       mode,
       session: this.session,
@@ -278,8 +286,28 @@ export class App {
       location: location || undefined,
       placeType: placeType || undefined,
       contextTags: tags,
+      style: prefs.promptStyle,
       recent,
     });
+
+    // Optional AI pass: only when the user opted in and we're online. Any
+    // failure silently keeps the engine prompt above.
+    if (prefs.aiEnabled && aiAvailable()) {
+      this.setDialBusy(true);
+      try {
+        const ai = await generatePromptAI({
+          mode,
+          location: location || undefined,
+          placeType: placeType || undefined,
+          contextTags: tags,
+          style: prefs.promptStyle,
+        });
+        if (ai) prompt = ai;
+      } finally {
+        this.setDialBusy(false);
+      }
+    }
+
     this.current = prompt;
     try {
       sessionStorage.setItem(LAST_PROMPT_KEY, JSON.stringify(prompt));
@@ -312,6 +340,17 @@ export class App {
     if (typeof card?.scrollIntoView === 'function') {
       card.scrollIntoView({ behavior: prefersReducedMotion(prefs.reducedMotion) ? 'auto' : 'smooth', block: 'nearest' });
     }
+  }
+
+  /** Toggle the dial's "composing with AI" busy state (visual only). */
+  private setDialBusy(busy: boolean): void {
+    const dialEl = qs('.dial');
+    if (!dialEl) return;
+    dialEl.classList.toggle('is-busy', busy);
+    dialEl.setAttribute('aria-busy', busy ? 'true' : 'false');
+    const sub = qs('.dial-centre small');
+    if (sub) sub.textContent = busy ? t().spin.aiComposing : t().spin.dialSub;
+    if (busy) announce(t().spin.aiComposing);
   }
 
   private async haptic(): Promise<void> {
@@ -645,8 +684,29 @@ export class App {
         announce('Saved location cleared.');
       },
       openWorkshop: () => this.navigate('workshop'),
+      checkForUpdates: () => this.checkForUpdates(),
       onChange: () => this.applyPrefsToDocument(),
     });
+  }
+
+  private async checkForUpdates(): Promise<void> {
+    const s = t();
+    const status = qs('#update-status');
+    const btn = qs<HTMLButtonElement>('#set-check-update');
+    if (status) {
+      (status as HTMLElement).hidden = false;
+      status.textContent = s.settings.checking;
+    }
+    if (btn) btn.disabled = true;
+    const checked = await checkForUpdate();
+    if (btn) btn.disabled = false;
+    if (!status) return;
+    // If an update was found, notifyUpdate() will have flipped the banner on.
+    status.textContent = this.updateReady
+      ? s.settings.updateFound
+      : checked
+        ? s.settings.upToDate
+        : s.settings.upToDate;
   }
 
   private renderWorkshopView(): void {
