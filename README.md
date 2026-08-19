@@ -1,18 +1,29 @@
 <p align="center">
-  <img src="assets/logo/logo-stacked.svg" alt="PhotoCue by Storitellah" width="240" />
+  <img src="assets/spinner.svg" alt="PhotoCue spinning documentary-photo-prompt dial" width="240" />
 </p>
 
 <h1 align="center">PhotoCue</h1>
 
 <p align="center"><strong>One tap. One place. One story.</strong></p>
 
-<p align="center">One-tap, location-aware photo prompts for documentary photographers and visual storytellers.</p>
+<p align="center">One-tap, location-aware photo prompts for documentary photographers, filmmakers, and visual storytellers.<br/>Offline-first, private by default, with optional AI-composed prompts.</p>
+
+<p align="center">
+  <a href="https://photocue.pages.dev"><strong>▶ Open the live app</strong></a>
+</p>
 
 <p align="center">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-121212" />
   <img alt="PWA" src="https://img.shields.io/badge/PWA-installable-F35B35" />
   <img alt="Offline first" src="https://img.shields.io/badge/offline-first-65705B" />
+  <img alt="AI optional" src="https://img.shields.io/badge/AI-optional-F35B35" />
   <img alt="No account" src="https://img.shields.io/badge/no%20account-required-74736F" />
+</p>
+
+<p align="center">
+  <img src="screenshots/01-spinner.svg" width="200" alt="Spinner" />
+  <img src="screenshots/02-location-prompt.svg" width="200" alt="Location prompt" />
+  <img src="screenshots/03-story-path.svg" width="200" alt="Story Path" />
 </p>
 
 ---
@@ -28,11 +39,14 @@ photo story from opening image to closing frame.
 
 Everything runs **offline** after the first load. There is **no account**, no
 advertising, and no tracking. Your stories, notes, locations, and prompt history
-stay on your device.
+stay on your device. **The spinner is the heart of the app** — tap it and a
+practical, documentary-grade prompt appears instantly.
 
 ## Features
 
-- **One-tap prompt spinner** — a photographic command dial you can tap, swipe, or trigger with the spacebar.
+- **A spinner at the centre** — a photographic command dial you can tap, swipe, or trigger with the spacebar; a satisfying, catchy spin lands a fresh prompt every time.
+- **Documentary & cinematic prompts** — vocabulary drawn from film grammar, lenses, light, and the decisive moment. Choose a **prompt style**: Observational, Cinematic, or Poetic.
+- **Optional AI generation** — opt in and prompts are composed live by an AI model via a same-origin Cloudflare Function. Off by default; the app stays fully offline and private otherwise, and always falls back to the local engine.
 - **General and location-aware prompts** — neutral, observational, never assuming.
 - **Installation-specific prompt sequences** — a local anonymous seed means different devices get different prompts.
 - **Offline prompt generation** — a compositional engine with hundreds of thousands of combinations, fully local.
@@ -116,11 +130,40 @@ Android package name and iOS bundle identifier: `com.storitellah.photocue`.
 
 ## Deployment
 
-The app deploys to **GitHub Pages** via `.github/workflows/pages.yml` on every
-push to `main`. The production build uses a base path of `/photocue/` (see
-`vite.config.ts`); if you fork under a different repository name, update the
-`base` value to match. The GitHub Pages site is both the working app and the
-product landing page.
+PhotoCue is a static, root-served PWA and runs on any static host.
+
+### Cloudflare Pages (production — [photocue.pages.dev](https://photocue.pages.dev))
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Node version | `22` (pinned via `.node-version`) |
+| Base path | `/` (default — do **not** set `BASE_PATH`) |
+
+The base path is driven by the `BASE_PATH` env var and defaults to `/`, which is
+correct for root-served hosts like Cloudflare Pages. Because the app uses hash
+routing, no SPA redirect rules are needed.
+
+#### Enabling AI prompts (optional)
+
+The AI feature is served by a Cloudflare Pages Function at
+[`functions/api/generate.ts`](functions/api/generate.ts) using **Workers AI** —
+no API key required. To turn it on:
+
+1. In the Cloudflare dashboard, open your Pages project → **Settings → Functions → Workers AI bindings**.
+2. Add a binding with variable name **`AI`**.
+3. Redeploy. Users can then enable **AI prompt generation** in the app's Settings.
+
+If the binding is absent, the function returns a graceful error and the app
+falls back to its offline engine — nothing breaks. The request is same-origin,
+so the app's strict Content-Security-Policy needs no changes.
+
+### GitHub Pages
+
+A parallel deploy runs via `.github/workflows/pages.yml` on every push to
+`main`. That workflow builds with `BASE_PATH=/photocue/` because GitHub Pages
+serves from a sub-path.
 
 ## Privacy
 

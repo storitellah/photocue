@@ -3,6 +3,32 @@
 All notable changes to PhotoCue are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-08-19
+
+### Added
+
+- **Spinner-centred spin screen**: the command dial is now the hero of the app,
+  with a catchier multi-turn spin animation, an AI "composing" state, and the
+  prompt controls tucked into a collapsible **Refine your prompt** panel.
+- **Documentary & cinematic vocabulary**: new banks for lenses/focal length,
+  named light quality, film grammar, the decisive moment, and story-spine
+  intent, plus cinematic templates — prompts are noticeably less generic.
+- **Prompt style** setting: choose **Observational**, **Cinematic**, or
+  **Poetic**; the engine biases template selection accordingly.
+- **Optional AI prompt generation** (opt-in, beta): composes prompts via a
+  same-origin Cloudflare Pages Function using Workers AI. Off by default, always
+  falls back to the offline engine, and needs no CSP change or API key.
+- **Settings additions**: a Prompts group (style + AI toggle with a privacy
+  note) and an App version & updates group with a **Check for updates** button
+  and a changelog link.
+- **Animated README spinner** and refreshed visuals; Cloudflare Pages + Workers
+  AI deployment instructions.
+
+### Changed
+
+- Base path is now driven by `BASE_PATH` (defaults to `/`) so the same build
+  serves root hosts (Cloudflare Pages) and GitHub Pages' sub-path.
+
 ## [1.0.0] — 2026-08-07
 
 ### Added

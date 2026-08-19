@@ -118,7 +118,11 @@ export function promptCard(p: Prompt, opts: { saved?: boolean; showEthics?: bool
   return `
   <article class="prompt-card" tabindex="-1" aria-label="Generated prompt">
     <div class="card-top">
-      <span class="mode-label">${escapeHtml(p.mode)}</span>
+      <span class="mode-label">${escapeHtml(p.mode)}${
+        p.source === 'ai'
+          ? ` <span class="ai-badge" title="${escapeHtml(s.card.byAiTitle)}">✦ ${escapeHtml(s.card.byAi)}</span>`
+          : ''
+      }</span>
       <span class="meta" data-difficulty="${escapeHtml(p.difficulty)}">${escapeHtml(p.difficulty)} · ${escapeHtml(p.time)}</span>
     </div>
     <h2 class="prompt-title">${escapeHtml(p.title)}</h2>

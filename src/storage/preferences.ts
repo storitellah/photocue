@@ -23,6 +23,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   locationHistory: true,
   analytics: false,
   language: 'en',
+  promptStyle: 'observational',
+  aiEnabled: false,
 };
 
 let cache: Preferences | undefined;
